@@ -97,4 +97,4 @@ jobs:
     # Step 11: Apply Kubernetes manifests
     - name: Deploy to Kubernetes
       run: |
-        kubectl apply -f k8s-manifests/
+        kubectl apply -f mtr-manifests/
