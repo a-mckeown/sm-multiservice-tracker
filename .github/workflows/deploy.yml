@@ -93,3 +93,24 @@ jobs:
         done
       env:
         IMAGE_TAG: ${{ env.IMAGE_TAG }}
+
+    # Step 11: Update Kubernetes manifests with new image tag
+    - name: Update Kubernetes manifests
+      run: |
+        for service in product-service order-service inventory-service; do
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$service
+          sed -i "s|$IMAGE_NAME:.*|$IMAGE_NAME:$IMAGE_TAG|" k8s-manifests/$service.yaml
+        done
+
+        # Commit and push changes if any
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add k8s-manifests/*.yaml
+        if git diff --cached --quiet; then
+          echo "No changes to commit."
+        else
+          git commit -m "Update image tags to $IMAGE_TAG"
+          git push
+        fi
+      env:
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
