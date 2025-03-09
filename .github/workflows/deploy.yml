@@ -59,6 +59,12 @@ jobs:
     - name: Set IMAGE_TAG
       run: echo "IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
 
+    - name: Debug IMAGE_TAG
+      run: echo "Using IMAGE_TAG=$IMAGE_TAG"
+      env:
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+
+
     # Step 8: Update Kubernetes deployment file with the correct image tag
     - name: Update Kubernetes deployment file with the correct image tag
       run: |
