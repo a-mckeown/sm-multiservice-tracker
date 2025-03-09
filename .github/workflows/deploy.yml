@@ -63,9 +63,9 @@ jobs:
     - name: Update Kubernetes deployment file with the correct image tag
       run: |
         IMAGE_TAG=${{ env.IMAGE_TAG }}
-        sed -i "s|ghcr.io/${{ github.repository_owner }}/inventory-service:.*|ghcr.io/${{ github.repository_owner }}/inventory-service:$IMAGE_TAG|" k8s/deployment.yaml
-        sed -i "s|ghcr.io/${{ github.repository_owner }}/order-service:.*|ghcr.io/${{ github.repository_owner }}/order-service:$IMAGE_TAG|" k8s/deployment.yaml
-        sed -i "s|ghcr.io/${{ github.repository_owner }}/product-service:.*|ghcr.io/${{ github.repository_owner }}/product-service:$IMAGE_TAG|" k8s/deployment.yaml
+        sed -i "s|ghcr.io/${{ github.repository_owner }}/inventory-service:.*|ghcr.io/${{ github.repository_owner }}/inventory-service:$IMAGE_TAG|" mtr/inventory-service.yaml
+        sed -i "s|ghcr.io/${{ github.repository_owner }}/order-service:.*|ghcr.io/${{ github.repository_owner }}/order-service:$IMAGE_TAG|" mtr/order-service.yaml
+        sed -i "s|ghcr.io/${{ github.repository_owner }}/product-service:.*|ghcr.io/${{ github.repository_owner }}/product-service:$IMAGE_TAG|" mtr/product-service.yaml
 
     # Step 9: Log in to GitHub Container Registry
     - name: Log in to GHCR
