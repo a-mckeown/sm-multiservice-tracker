@@ -77,9 +77,9 @@ jobs:
           echo "Pushing Docker image $IMAGE_NAME:$IMAGE_TAG"
           docker push $IMAGE_NAME:$IMAGE_TAG
           docker push $IMAGE_NAME:latest
-       done
-     env:
-       IMAGE_TAG: ${{ env.IMAGE_TAG }}
+        done
+      env:
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
 
     # Step 10: Run Docker containers (Optional for testing)
     - name: Run Docker containers (optional)
