@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: product-service
-          image: ghcr.io/${{ github.repository_owner }}/order-service:${IMAGE_TAG}
+          image: ghcr.io/${{ github.repository_owner }}/order-service:0db0eec
           ports:
             - containerPort: 5000

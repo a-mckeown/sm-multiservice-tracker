@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: inventory-service
-          image: ghcr.io/${{ github.repository_owner }}/inventory-service:${IMAGE_TAG}
+          image: ghcr.io/${{ github.repository_owner }}/inventory-service:0db0eec
           ports:
             - containerPort: 5002
 ---
