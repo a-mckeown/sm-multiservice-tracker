@@ -112,8 +112,8 @@ jobs:
         export REPO_OWNER=${{ github.repository_owner }}
 
         for service in product-service order-service inventory-service; do
-          envsubst < mtr-manifest/$service.yaml > mtr-manifests/$service-updated.yaml
-          mv mtr-manifest/$service-updated.yaml mtr-manifests/$service.yaml
+          envsubst < mtr-manifests/$service.yaml > mtr-manifests/$service-updated.yaml
+          mv mtr-manifests/$service-updated.yaml mtr-manifests/$service.yaml
         done
 
         git config --global user.email "actions@github.com"
