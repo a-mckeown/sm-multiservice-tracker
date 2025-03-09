@@ -1,0 +1,6 @@
+Flask==3.0.0
+flask-cors==4.0.0
+requests==2.31.0
+gunicorn==21.2.0  # Optional for running in production
+pytest==8.3.5  # For testing
+flake8==7.0.0  # For linting
