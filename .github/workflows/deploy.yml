@@ -11,7 +11,7 @@ permissions:
   packages: write  # Allow pushing Docker images to GHCR
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -41,13 +41,19 @@ jobs:
 
     # Step 5: Debug test discovery
     - name: Debug test discovery
-      run: pytest --collect-only
+      run: |
+        for service in product-service order-service inventory-service; do
+          echo "Collecting tests for $service..."
+          pytest $service/tests --collect-only
+        done
 
     # Step 6: Run tests
     - name: Run tests
       run: |
-        export PYTHONPATH=$GITHUB_WORKSPACE
-        pytest
+        for service in product-service order-service inventory-service; do
+          echo "Running tests for $service..."
+          pytest $service/tests
+        done
 
     # Step 7: Set IMAGE_TAG environment variable
     - name: Set IMAGE_TAG
@@ -73,28 +79,12 @@ jobs:
       env:
         IMAGE_TAG: ${{ env.IMAGE_TAG }}
 
-    # Step 10: Update Kubernetes manifests with new image tags
-    - name: Update Kubernetes manifests
+    # Step 10: Run Docker containers (Optional for testing)
+    - name: Run Docker containers (optional)
       run: |
         for service in product-service order-service inventory-service; do
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$service
-          sed -i "s|$IMAGE_NAME:.*|$IMAGE_NAME:$IMAGE_TAG|" mtr-manifests/$service.yaml
+          docker run -d --rm -p 5000:5000 --name $service $IMAGE_NAME:$IMAGE_TAG
         done
-
-        # Commit and push changes if any
-        git config --global user.email "actions@github.com"
-        git config --global user.name "GitHub Actions"
-        git add mtr-manifests/*.yaml
-        if git diff --cached --quiet; then
-          echo "No changes to commit."
-        else
-          git commit -m "Update image tags to $IMAGE_TAG"
-          git push
-        fi
       env:
         IMAGE_TAG: ${{ env.IMAGE_TAG }}
-
-    # Step 11: Apply Kubernetes manifests
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl apply -f mtr-manifests/
