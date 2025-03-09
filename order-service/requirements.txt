@@ -1,0 +1,6 @@
+Flask==3.0.0
+flask-sqlalchemy==3.1.1  # If using SQLAlchemy ORM
+psycopg2-binary==2.9.9  # PostgreSQL adapter
+requests==2.31.0
+pytest==8.3.5
+flake8==7.0.0
