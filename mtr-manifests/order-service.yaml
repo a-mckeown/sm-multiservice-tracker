@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: image: ghcr.io/REPO_OWNER/inventory-service:IMAGE_TAG
+          image: image: ghcr.io/REPO_OWNER/inventory-service:d712aa1
           ports:
             - containerPort: 5001
 ---
