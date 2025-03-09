@@ -78,7 +78,7 @@ jobs:
       run: |
         for service in product-service order-service inventory-service; do
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$service
-          sed -i "s|$IMAGE_NAME:.*|$IMAGE_NAME:$IMAGE_TAG|" k8s-manifests/$service.yaml
+          sed -i "s|$IMAGE_NAME:.*|$IMAGE_NAME:$IMAGE_TAG|" mtr-manifests/$service.yaml
         done
 
         # Commit and push changes if any
