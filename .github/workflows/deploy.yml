@@ -89,7 +89,7 @@ jobs:
             order-service) PORT=5002 ;;
             inventory-service) PORT=5003 ;;
         esac
-  docker run -d --rm -p $PORT:5000 --name $service $IMAGE_NAME:$IMAGE_TAG
-done
+        docker run -d --rm -p $PORT:5000 --name $service $IMAGE_NAME:$IMAGE_TAG
+       done
       env:
         IMAGE_TAG: ${{ env.IMAGE_TAG }}
