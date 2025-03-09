@@ -71,13 +71,15 @@ jobs:
     - name: Build & Push Docker images
       run: |
         for service in product-service order-service inventory-service; do
-          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$service
+          IMAGE_NAME="ghcr.io/${{ github.repository_owner }}/$service"
+          echo "Building Docker image for $service..."
           docker build -t $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:latest ./$service
+          echo "Pushing Docker image $IMAGE_NAME:$IMAGE_TAG"
           docker push $IMAGE_NAME:$IMAGE_TAG
           docker push $IMAGE_NAME:latest
-        done
-      env:
-        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+       done
+     env:
+       IMAGE_TAG: ${{ env.IMAGE_TAG }}
 
     # Step 10: Run Docker containers (Optional for testing)
     - name: Run Docker containers (optional)
