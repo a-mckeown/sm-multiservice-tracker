@@ -1,0 +1,100 @@
+name: Python Microservices with Docker
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: write
+  packages: write  # Allow pushing Docker images to GHCR
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - uses: actions/checkout@v4
+
+    # Step 2: Set up Python environment
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        for service in product-service order-service inventory-service; do
+          if [ -f $service/requirements.txt ]; then pip install -r $service/requirements.txt; fi
+        done
+
+    # Step 4: Lint with flake8
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    # Step 5: Debug test discovery
+    - name: Debug test discovery
+      run: pytest --collect-only
+
+    # Step 6: Run tests
+    - name: Run tests
+      run: |
+        export PYTHONPATH=$GITHUB_WORKSPACE
+        pytest
+
+    # Step 7: Set IMAGE_TAG environment variable
+    - name: Set IMAGE_TAG
+      run: echo "IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+    # Step 8: Log in to GitHub Container Registry
+    - name: Log in to GHCR
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    # Step 9: Build & Push Docker images for each service
+    - name: Build & Push Docker images
+      run: |
+        for service in product-service order-service inventory-service; do
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$service
+          docker build -t $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:latest ./$service
+          docker push $IMAGE_NAME:$IMAGE_TAG
+          docker push $IMAGE_NAME:latest
+        done
+      env:
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+
+    # Step 10: Update Kubernetes manifests with new image tags
+    - name: Update Kubernetes manifests
+      run: |
+        for service in product-service order-service inventory-service; do
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$service
+          sed -i "s|$IMAGE_NAME:.*|$IMAGE_NAME:$IMAGE_TAG|" k8s-manifests/$service.yaml
+        done
+
+        # Commit and push changes if any
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add k8s-manifests/*.yaml
+        if git diff --cached --quiet; then
+          echo "No changes to commit."
+        else
+          git commit -m "Update image tags to $IMAGE_TAG"
+          git push
+        fi
+      env:
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+
+    # Step 11: Apply Kubernetes manifests
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f k8s-manifests/
