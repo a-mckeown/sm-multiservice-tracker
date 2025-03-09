@@ -56,8 +56,13 @@ jobs:
         done
 
     # Step 7: Set IMAGE_TAG environment variable
-    - name: Set IMAGE_TAG
-      run: echo "IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+   - name: Set IMAGE_TAG
+     run: echo "IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_ENV
+
+   - name: Update Kubernetes deployment file with the correct image tag
+     run: |
+       sed -i "s|ghcr.io/${{ github.repository_owner }}/inventory-service:.*|ghcr.io/${{ github.repository_owner }}/inventory-service:$IMAGE_TAG|" k8s/deployment.yaml
+
 
     # Step 8: Log in to GitHub Container Registry
     - name: Log in to GHCR
