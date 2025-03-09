@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: inventory-service
-          image: image: ghcr.io/REPO_OWNER/inventory-service:IMAGE_TAG
+          image: image: ghcr.io/a-mckeown/inventory-service:b3af0d3
           ports:
             - containerPort: 5002
 ---
